@@ -44,10 +44,7 @@ Update-LapsADSchema
 ### Step 3 — Set Computer Self Permissions
 \`\`\`powershell
 Set-LapsADComputerSelfPermission \`
--Identity "OU=IT_Department,DC=secure,DC=local"
-
-Set-LapsADComputerSelfPermission \`
--Identity "OU=Domain Controllers,DC=secure,DC=local"
+-Identity "OU=Domain Controllers,DC=YOUR-DOMAIN,DC=local"
 \`\`\`
 
 ### Step 4 — Configure GPO
@@ -78,11 +75,11 @@ Set-GPRegistryValue -Name "LAPS Policy" \`
 
 ## Verification
 \`\`\`powershell
-Get-LapsADPassword -Identity "EC2AMAZ-NEICN09" -AsPlainText
+Get-LapsADPassword -Identity "YOUR-DC-NAME" -AsPlainText
 
-ComputerName       : EC2AMAZ-NEICN09
+ComputerName       : YOUR-DC-NAME
 Account            : Administrator
-Password           : gP+6VSY4vik#U4Mw[5]z
+Password           : **REDACTED**
 PasswordUpdateTime : 10/25/2026 8:32:57 AM
 ExpirationTimestamp: 11/24/2026 8:32:57 AM
 Source             : EncryptedDSRMPassword

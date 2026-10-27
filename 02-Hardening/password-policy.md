@@ -28,7 +28,7 @@ force and password spray attacks.
 ### Via PowerShell
 \`\`\`powershell
 Set-ADDefaultDomainPasswordPolicy \`
--Identity "secure.local" \`
+-Identity "YOUR-DOMAIN.local" \`
 -MinPasswordLength 15 \`
 -MaxPasswordAge "90.00:00:00" \`
 -MinPasswordAge "1.00:00:00" \`

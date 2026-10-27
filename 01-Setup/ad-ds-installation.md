@@ -20,7 +20,7 @@ Server Manager
 → Yellow notification flag
 → Promote this server to DC
 → Add new forest
-→ Domain name: secure.local
+→ Domain name: YOUR-DOMAIN.local
 → Forest level: Windows Server 2016
 → Set DSRM password
 → Install
@@ -51,7 +51,7 @@ Netlogon Running
 
 ## Structure Created
 \`\`\`
-secure.local
+YOUR-DOMAIN.local
 ├── OU=IT_Department
 ├── OU=HR_Department
 ├── OU=Servers

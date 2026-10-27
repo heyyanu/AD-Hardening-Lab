@@ -34,33 +34,36 @@ Start → Active Directory Administrative Center
 →OK
 
 ### Via PowerShell
-\`\`\`powershell
-New-ADFineGrainedPasswordPolicy \`
--Name "AdminPolicy" \`
--Precedence 10 \`
--MinPasswordLength 20 \`
--MaxPasswordAge "30.00:00:00" \`
--MinPasswordAge "1.00:00:00" \`
--PasswordHistoryCount 24 \`
--ComplexityEnabled $true \`
--LockoutThreshold 3 \`
--LockoutDuration "00:00:00" \`
--LockoutObservationWindow "00:30:00"
+```powershell
+New-ADFineGrainedPasswordPolicy `
+    -Name "AdminPolicy" `
+    -Precedence 10 `
+    -MinPasswordLength 20 `
+    -MaxPasswordAge "30.00:00:00" `
+    -MinPasswordAge "1.00:00:00" `
+    -PasswordHistoryCount 24 `
+    -ComplexityEnabled $true `
+    -LockoutThreshold 3 `
+    -LockoutDuration "00:00:00" `
+    -LockoutObservationWindow "00:30:00"
 
-Add-ADFineGrainedPasswordPolicySubject \`
--Identity "AdminPolicy" \`
--Subjects "Domain Admins"
-\`\`\`
+Add-ADFineGrainedPasswordPolicySubject `
+    -Identity "AdminPolicy" `
+    -Subjects "Domain Admins"
+```
 
 ## Verification
-\`\`\`powershell
+```powershell
 Get-ADFineGrainedPasswordPolicy -Filter * |
-Select Name, MinPasswordLength, LockoutThreshold, Precedence
+Select-Object Name, MinPasswordLength, LockoutThreshold, Precedence
+```
 
+Example policy output (as documented):
+```text
 Name        MinPasswordLength LockoutThreshold Precedence
 ----        ----------------- ---------------- ----------
 AdminPolicy                20                3         10
-\`\`\`
+```
 
 ## Challenge Faced
 - Initial creation failed with "modification not permitted"

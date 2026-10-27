@@ -49,7 +49,7 @@ crackable. Two major attacks exploit this:
 ## Implementation
 
 ### Force AES Encryption via GPO
-\`\`\`
+```text
 Group Policy Management
 → Default Domain Policy → Edit
 → Computer Configuration
@@ -64,14 +64,14 @@ Group Policy Management
    ❌ DES_CBC_CRC — uncheck
    ❌ DES_CBC_MD5 — uncheck
    ❌ RC4_HMAC_MD5 — uncheck
-\`\`\`
+```
 
 ### Set AES on All User Accounts
-\`\`\`powershell
+```powershell
 # Set AES on all users
 $users = @("jsmith", "jdoe", "itadmin", "svc-webapp")
 foreach ($user in $users) {
-    Set-ADUser -Identity $user \`
+    Set-ADUser -Identity $user `
     -KerberosEncryptionType AES128,AES256
     Write-Host "AES set for: $user"
 }
@@ -79,29 +79,29 @@ foreach ($user in $users) {
 # Set AES on admin accounts
 Get-ADUser -Filter {AdminCount -eq 1} |
 ForEach-Object {
-    Set-ADUser -Identity $_.SamAccountName \`
+    Set-ADUser -Identity $_.SamAccountName `
     -KerberosEncryptionType AES128,AES256
 }
-\`\`\`
+```
 
 ### Enable Pre-Authentication on All Accounts
-\`\`\`powershell
+```powershell
 # Find accounts with pre-auth disabled
-Get-ADUser -Filter {DoesNotRequirePreAuth -eq $true} \`
--Properties DoesNotRequirePreAuth |
-Select Name, SamAccountName
+Get-ADUser -Filter {DoesNotRequirePreAuth -eq $true} `
+    -Properties DoesNotRequirePreAuth |
+Select-Object Name, SamAccountName
 
 # Fix all accounts
 Get-ADUser -Filter {DoesNotRequirePreAuth -eq $true} |
 ForEach-Object {
-    Set-ADAccountControl \`
-    -Identity $_.SamAccountName \`
+    Set-ADAccountControl `
+    -Identity $_.SamAccountName `
     -DoesNotRequirePreAuth $false
 }
-\`\`\`
+```
 
 ### Set Ticket Lifetime via GPO
-\`\`\`
+```text
 Default Domain Policy → Edit
 → Computer Configuration
 → Windows Settings → Security Settings
@@ -110,15 +110,18 @@ Default Domain Policy → Edit
 → Maximum lifetime for service ticket: 600 minutes
 → Maximum lifetime for user ticket renewal: 7 days
 → Maximum tolerance for clock sync: 5 minutes
-\`\`\`
+```
 
 ## Verification
-\`\`\`powershell
+```powershell
 # Verify AES on all users
 Get-ADUser -Filter * -Properties KerberosEncryptionType |
-Select Name, KerberosEncryptionType |
+Select-Object Name, KerberosEncryptionType |
 Format-Table -AutoSize
+```
 
+Example output (as documented):
+```text
 Name          KerberosEncryptionType
 ----          ----------------------
 Administrator {AES128, AES256}
@@ -129,9 +132,9 @@ svc-webapp    {AES128, AES256}
 
 # Verify no pre-auth disabled accounts
 Get-ADUser -Filter {DoesNotRequirePreAuth -eq $true} |
-Select Name
+Select-Object Name
 # Should return nothing ✅
-\`\`\`
+```
 
 ## ⚠️ Challenge Faced — Critical Warning
 Enforcing AES only via GPO broke authentication
@@ -145,16 +148,16 @@ and locked us out of the server completely.
 - Had to recover via AWS volume attachment
 
 ### Recovery Process
-\`\`\`powershell
+```powershell
 # Fix via attached volume on helper server
 reg load HKLM\BROKEN "D:\Windows\System32\config\SYSTEM"
 
 # Allow ALL encryption types
-reg add "HKLM\BROKEN\ControlSet001\Control\Lsa\Kerberos\Parameters" \`
-/v SupportedEncryptionTypes /t REG_DWORD /d 2147483647 /f
+reg add "HKLM\BROKEN\ControlSet001\Control\Lsa\Kerberos\Parameters" `
+    /v SupportedEncryptionTypes /t REG_DWORD /d 2147483647 /f
 
 reg unload HKLM\BROKEN
-\`\`\`
+```
 
 ### Lesson Learned
 - Never enforce AES only without testing first

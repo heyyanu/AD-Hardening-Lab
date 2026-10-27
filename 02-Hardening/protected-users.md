@@ -21,7 +21,7 @@ Think of it like an automatic armour upgrade for admin accounts.
 | No delegation | Cannot be impersonated | Delegation abuse |
 
 ## Who to Add
-\`\`\`
+```text
 ✅ Add these accounts:
 → Domain Admins
 → Enterprise Admins
@@ -32,7 +32,7 @@ Think of it like an automatic armour upgrade for admin accounts.
 → Regular users (breaks daily work)
 → Service accounts (breaks services)
 → Computer accounts (breaks auth)
-\`\`\`
+```
 
 ## What Happens if Regular Users Added
 - Cannot connect to some network resources
@@ -44,42 +44,45 @@ Think of it like an automatic armour upgrade for admin accounts.
 ## Implementation
 
 ### Via PowerShell
-\`\`\`powershell
+```powershell
 # Add admin accounts to Protected Users
-Add-ADGroupMember -Identity "Protected Users" \`
--Members "Administrator"
+Add-ADGroupMember -Identity "Protected Users" `
+    -Members "Administrator"
 
-Add-ADGroupMember -Identity "Protected Users" \`
--Members "itadmin"
+Add-ADGroupMember -Identity "Protected Users" `
+    -Members "itadmin"
 
 # Verify members
 Get-ADGroupMember -Identity "Protected Users" |
-Select Name, SamAccountName
-\`\`\`
+Select-Object Name, SamAccountName
+```
 
 ### Via GUI
-\`\`\`
+```text
 Active Directory Users and Computers
 → Find "Protected Users" group
 → Right click → Properties
 → Members tab → Add
 → Type admin username → OK
 → Apply → OK
-\`\`\`
+```
 
 ## Verification
-\`\`\`powershell
+```powershell
 Get-ADGroupMember -Identity "Protected Users" |
-Select Name, SamAccountName
+Select-Object Name, SamAccountName
+```
 
+Example membership output (as documented):
+```text
 Name          SamAccountName
 ----          --------------
 Administrator Administrator
 IT Admin      itadmin
-\`\`\`
+```
 
 ## Testing Protection Works
-\`\`\`powershell
+```powershell
 # Try NTLM auth with Protected Users account
 # Should fail with:
 # "NTLM authentication is not allowed for this account"
@@ -90,7 +93,7 @@ IT Admin      itadmin
 # Check Kerberos ticket lifetime
 # Should show 4 hour expiry maximum
 klist
-\`\`\`
+```
 
 ## Security Impact
 | Before Protected Users | After Protected Users |

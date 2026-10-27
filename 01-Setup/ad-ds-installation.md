@@ -27,7 +27,7 @@ Server Manager
 → Server reboots automatically
 
 ### Step 3 — Verify Installation
-\`\`\`powershell
+```powershell
 # Verify domain is working
 Get-ADDomain
 
@@ -35,29 +35,31 @@ Get-ADDomain
 Get-ADDomainController
 
 # Verify services running
-Get-Service adws,kdc,netlogon,dns |
-Select Name, Status
-\`\`\`
+Get-Service adws, kdc, netlogon, dns |
+    Select-Object Name, Status
+```
 
 ## Verification Results
-\`\`\`
+```text
+Example service status output (as documented):
 Name      Status
 ----      ------
 adws     Running
 dns      Running
 kdc      Running
 Netlogon Running
-\`\`\`
+```
 
 ## Structure Created
-\`\`\`
+```text
+Example directory structure:
 YOUR-DOMAIN.local
 ├── OU=IT_Department
 ├── OU=HR_Department
 ├── OU=Servers
 ├── OU=Workstations
 └── OU=ServiceAccounts
-\`\`\`
+```
 
 ## Users Created
 | Name | Username | Department |

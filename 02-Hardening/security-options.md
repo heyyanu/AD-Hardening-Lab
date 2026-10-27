@@ -56,7 +56,7 @@ Think of them like engine settings in a car:
 ## Implementation
 
 ### Via GPO
-\`\`\`
+```text
 Group Policy Management
 → Default Domain Controllers Policy
 → Edit
@@ -65,38 +65,38 @@ Group Policy Management
 → Security Settings → Local Policies
 → Security Options
 → Configure each setting
-\`\`\`
+```
 
 ### Via PowerShell
-\`\`\`powershell
+```powershell
 # Set LAN Manager level to 5
-Set-ItemProperty \`
--Path "HKLM:\SYSTEM\CurrentControlSet\Control\Lsa" \`
--Name "LmCompatibilityLevel" -Value 5
+Set-ItemProperty `
+    -Path "HKLM:\SYSTEM\CurrentControlSet\Control\Lsa" `
+    -Name "LmCompatibilityLevel" -Value 5
 
 # Enable SMB Signing
-Set-SmbServerConfiguration \`
--RequireSecuritySignature $true \`
--EnableSecuritySignature $true -Force
+Set-SmbServerConfiguration `
+    -RequireSecuritySignature $true `
+    -EnableSecuritySignature $true -Force
 
 # Block anonymous enumeration
-Set-ItemProperty \`
--Path "HKLM:\SYSTEM\CurrentControlSet\Control\Lsa" \`
--Name "RestrictAnonymous" -Value 1
+Set-ItemProperty `
+    -Path "HKLM:\SYSTEM\CurrentControlSet\Control\Lsa" `
+    -Name "RestrictAnonymous" -Value 1
 
 # Hide last username
-Set-ItemProperty \`
--Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" \`
--Name "DontDisplayLastUserName" -Value 1
+Set-ItemProperty `
+    -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" `
+    -Name "DontDisplayLastUserName" -Value 1
 
 # Disable WDigest
-Set-ItemProperty \`
--Path "HKLM:\SYSTEM\CurrentControlSet\Control\SecurityProviders\WDigest" \`
--Name "UseLogonCredential" -Value 0
-\`\`\`
+Set-ItemProperty `
+    -Path "HKLM:\SYSTEM\CurrentControlSet\Control\SecurityProviders\WDigest" `
+    -Name "UseLogonCredential" -Value 0
+```
 
 ## Verification
-\`\`\`powershell
+```powershell
 [PSCustomObject]@{
     LM_Auth_Level      = (Get-ItemProperty "HKLM:\SYSTEM\CurrentControlSet\Control\Lsa").LmCompatibilityLevel
     SMB_Signing        = (Get-SmbServerConfiguration).RequireSecuritySignature
@@ -104,13 +104,16 @@ Set-ItemProperty \`
     Hide_Last_Username = (Get-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System").DontDisplayLastUserName
     WDigest            = (Get-ItemProperty "HKLM:\SYSTEM\CurrentControlSet\Control\Lsa").NoLMHash
 } | Format-List
+```
 
+Example verification output (as documented):
+```text
 LM_Auth_Level      : 5     
 SMB_Signing        : True  
 Anonymous_Enum     : 1     
 Hide_Last_Username : 1     
 WDigest            : 1     
-\`\`\`
+```
 
 ## Key Lessons
 - Security Options fix weak Windows defaults

@@ -24,13 +24,13 @@ With LAPS:
 ## Implementation
 
 ### Step 1 — Install LAPS Module
-\`\`\`powershell
+```powershell
 Import-Module LAPS
 Get-Command -Module LAPS
-\`\`\`
+```
 
 ### Step 2 — Extend AD Schema
-\`\`\`powershell
+```powershell
 Update-LapsADSchema
 # Answer Y to all prompts
 # Adds these attributes to AD:
@@ -39,16 +39,16 @@ Update-LapsADSchema
 # ms-LAPS-EncryptedPassword
 # ms-LAPS-EncryptedPasswordHistory
 # ms-LAPS-EncryptedDSRMPassword
-\`\`\`
+```
 
 ### Step 3 — Set Computer Self Permissions
-\`\`\`powershell
-Set-LapsADComputerSelfPermission \`
--Identity "OU=Domain Controllers,DC=YOUR-DOMAIN,DC=local"
-\`\`\`
+```powershell
+Set-LapsADComputerSelfPermission `
+    -Identity "OU=Domain Controllers,DC=YOUR-DOMAIN,DC=local"
+```
 
 ### Step 4 — Configure GPO
-\`\`\`
+```text
 Group Policy Management
 → Create GPO: "LAPS Policy"
 → Computer Configuration
@@ -58,25 +58,28 @@ Group Policy Management
 → Password Settings: Length 20, Age 30 days
 → Enable password encryption: Enabled
 → Link GPO to all OUs
-\`\`\`
+```
 
 ### Step 5 — Configure via Registry
-\`\`\`powershell
-Set-GPRegistryValue -Name "LAPS Policy" \`
--Key "HKLM\SOFTWARE\Policies\Microsoft\Windows\LAPS" \`
--ValueName "BackupDirectory" \`
--Type DWord -Value 2
+```powershell
+Set-GPRegistryValue -Name "LAPS Policy" `
+    -Key "HKLM\SOFTWARE\Policies\Microsoft\Windows\LAPS" `
+    -ValueName "BackupDirectory" `
+    -Type DWord -Value 2
 
-Set-GPRegistryValue -Name "LAPS Policy" \`
--Key "HKLM\SOFTWARE\Policies\Microsoft\Windows\LAPS" \`
--ValueName "ADBackupDSRMPassword" \`
--Type DWord -Value 1
-\`\`\`
+Set-GPRegistryValue -Name "LAPS Policy" `
+    -Key "HKLM\SOFTWARE\Policies\Microsoft\Windows\LAPS" `
+    -ValueName "ADBackupDSRMPassword" `
+    -Type DWord -Value 1
+```
 
 ## Verification
-\`\`\`powershell
+```powershell
 Get-LapsADPassword -Identity "YOUR-DC-NAME" -AsPlainText
+```
 
+Example output (password redacted; as documented):
+```text
 ComputerName       : YOUR-DC-NAME
 Account            : Administrator
 Password           : **REDACTED**
@@ -84,7 +87,7 @@ PasswordUpdateTime : 10/25/2026 8:32:57 AM
 ExpirationTimestamp: 11/24/2026 8:32:57 AM
 Source             : EncryptedDSRMPassword
 DecryptionStatus   : Success
-\`\`\`
+```
 
 ## Challenges Faced
 - Windows Server 2019 does not have LAPS built in

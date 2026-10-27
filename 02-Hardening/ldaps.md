@@ -36,31 +36,31 @@ With LDAPS:
 ## Implementation
 
 ### Step 1 — Install AD CS
-\`\`\`powershell
-Install-WindowsFeature ADCS-Cert-Authority \`
--IncludeManagementTools
-\`\`\`
+```powershell
+Install-WindowsFeature ADCS-Cert-Authority `
+    -IncludeManagementTools
+```
 
 ### Step 2 — Configure Enterprise Root CA
-\`\`\`powershell
-Install-AdcsCertificationAuthority \`
--CAType EnterpriseRootCa \`
--CaCommonName "SecureLabCA" \`
--KeyLength 2048 \`
--HashAlgorithmName SHA256 \`
--ValidityPeriod Years \`
--ValidityPeriodUnits 5 \`
--Force
-\`\`\`
+```powershell
+Install-AdcsCertificationAuthority `
+    -CAType EnterpriseRootCa `
+    -CaCommonName "SecureLabCA" `
+    -KeyLength 2048 `
+    -HashAlgorithmName SHA256 `
+    -ValidityPeriod Years `
+    -ValidityPeriodUnits 5 `
+    -Force
+```
 
 ### Step 3 — Restart Certificate Service
-\`\`\`powershell
+```powershell
 Restart-Service CertSvc
 Start-Sleep -Seconds 15
-\`\`\`
+```
 
 ### Step 4 — Enable LDAP Signing via GPO
-\`\`\`
+```text
 Group Policy Management
 → Default Domain Controllers Policy
 → Edit
@@ -69,26 +69,34 @@ Group Policy Management
 → Local Policies → Security Options
 → Domain controller: LDAP server signing requirements
 → Set to: Require signing
-\`\`\`
+```
 
 ## Verification
-\`\`\`powershell
+```powershell
 # Test LDAPS port 636 is listening
 Test-NetConnection -ComputerName "YOUR-DC-HOSTNAME" -Port 636
+```
 
+Example connection and certificate output (as documented):
+```text
 ComputerName     : YOUR-DC-HOSTNAME
 RemotePort       : 636
 TcpTestSucceeded : True
+```
 
+```powershell
 # Check certificate installed on DC
 Get-ChildItem Cert:\LocalMachine\My |
-Select Subject, Issuer, NotAfter |
+Select-Object Subject, Issuer, NotAfter |
 Format-Table -AutoSize
+```
 
+Example certificate output (as documented):
+```text
 Subject        Issuer         NotAfter
 -------        ------         --------
 CN=SecureLabCA CN=SecureLabCA 10/25/2031
-\`\`\`
+```
 
 ## Security Impact
 | Attack | Before LDAPS | After LDAPS |

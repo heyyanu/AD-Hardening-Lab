@@ -26,18 +26,18 @@ force and password spray attacks.
 ## Implementation
 
 ### Via PowerShell
-\`\`\`powershell
-Set-ADDefaultDomainPasswordPolicy \`
--Identity "YOUR-DOMAIN.local" \`
--MinPasswordLength 15 \`
--MaxPasswordAge "90.00:00:00" \`
--MinPasswordAge "1.00:00:00" \`
--PasswordHistoryCount 24 \`
--ComplexityEnabled $true \`
--LockoutThreshold 10 \`
--LockoutDuration "00:30:00" \`
--LockoutObservationWindow "00:30:00"
-\`\`\`
+```powershell
+Set-ADDefaultDomainPasswordPolicy `
+    -Identity "YOUR-DOMAIN.local" `
+    -MinPasswordLength 15 `
+    -MaxPasswordAge "90.00:00:00" `
+    -MinPasswordAge "1.00:00:00" `
+    -PasswordHistoryCount 24 `
+    -ComplexityEnabled $true `
+    -LockoutThreshold 10 `
+    -LockoutDuration "00:30:00" `
+    -LockoutObservationWindow "00:30:00"
+```
 
 ### Via GUI
 Group Policy Management
@@ -50,9 +50,12 @@ Group Policy Management
 → Configure each setting
 
 ## Verification
-\`\`\`powershell
+```powershell
 Get-ADDefaultDomainPasswordPolicy
+```
 
+Example policy output (as documented):
+```text
 ComplexityEnabled    : True
 LockoutDuration      : 00:30:00
 LockoutThreshold     : 10
@@ -60,4 +63,4 @@ MaxPasswordAge       : 90.00:00:00
 MinPasswordAge       : 1.00:00:00
 MinPasswordLength    : 15
 PasswordHistoryCount : 24
-\`\`\`
+```

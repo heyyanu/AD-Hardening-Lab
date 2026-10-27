@@ -10,7 +10,7 @@ controls, attack simulations, challenges faced, and lessons learned.
 - Cloud: Amazon Web Services (AWS)
 - Server: Windows Server 2019 Datacenter
 - Service: Active Directory Domain Services
-- Domain: secure.local
+- Domain: YOUR-DOMAIN.local
 - Instance: EC2 t2.medium
 
 ## 🔒 Security Controls Implemented

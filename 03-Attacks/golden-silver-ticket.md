@@ -14,7 +14,7 @@ can forge ANY Kerberos ticket for ANY user to access
 ANY resource in the domain — permanently.
 
 ### Why it is Dangerous
-\`\`\`
+```
 Normal Kerberos:
 User → requests ticket from KDC
 KDC  → verifies identity → issues ticket
@@ -27,10 +27,10 @@ Attacker has KRBTGT hash
 → Can access ANY resource
 → Ticket valid for 10 years by default
 → Persists even after password resets 💀
-\`\`\`
+```
 
 ### Attack Flow
-\`\`\`
+```
 Step 1 → Attacker compromises DC
 Step 2 → Dumps KRBTGT hash using Mimikatz
           mimikatz # lsadump::dcsync /user:krbtgt
@@ -44,16 +44,16 @@ Step 3 → Creates forged Golden Ticket
 Step 4 → Uses ticket to access anything
           mimikatz # kerberos::ptt golden.kirbi
 Step 5 → Full domain access achieved 💀
-\`\`\`
+```
 
 ### Requirements for Attack
-\`\`\`
+```
 Attacker needs:
 → Domain SID
 → KRBTGT password hash
 → Mimikatz or similar tool
 → Any valid username to forge
-\`\`\`
+```
 
 ## Silver Ticket Attack
 
@@ -72,7 +72,7 @@ password hash instead of KRBTGT hash.
 | Impact | Critical | High |
 
 ### Attack Flow
-\`\`\`
+```
 Step 1 → Attacker gets service account hash
           (via Kerberoasting or credential dump)
 Step 2 → Creates forged Silver Ticket
@@ -86,72 +86,72 @@ Step 2 → Creates forged Silver Ticket
           /ticket:silver.kirbi
 Step 3 → Uses ticket to access specific service
 Step 4 → Service access achieved 💀
-\`\`\`
+```
 
 ## Attack Results
 
 ### Before Hardening
-\`\`\`
+```
 Golden Ticket Result: VULNERABLE
 KRBTGT password age: Never rotated
 Ticket lifetime: 10 years possible
 Detection: No audit logging
 Risk Level: CRITICAL
-\`\`\`
+```
 
 ### After Hardening
-\`\`\`
+```
 Golden Ticket Result: MITIGATED
 KRBTGT password: Rotated
 Ticket lifetime: 10 hours maximum
 Detection: Event ID 4769 monitored
 Risk Level: REDUCED
-\`\`\`
+```
 
 ## Hardening Controls That Mitigate These Attacks
 
 ### 1. Rotate KRBTGT Password
-\`\`\`powershell
+```powershell
 # Rotate KRBTGT password
 # Must be done TWICE — AD keeps previous hash
-Set-ADAccountPassword -Identity krbtgt \`
--NewPassword (ConvertTo-SecureString \`
-"NewStr0ngP@ssw0rd!" -AsPlainText -Force) \`
+Set-ADAccountPassword -Identity krbtgt `
+-NewPassword (ConvertTo-SecureString `
+"NewStr0ngP@ssw0rd!" -AsPlainText -Force) `
 -Reset
 
 # Wait for replication then rotate again
 # This invalidates ALL existing golden tickets
-\`\`\`
+```
 
 ### 2. Enable Protected Users
-\`\`\`powershell
+```powershell
 # Admin accounts in Protected Users
 # Tickets expire after 4 hours maximum
 # Limits golden ticket usefulness
-Add-ADGroupMember -Identity "Protected Users" \`
+Add-ADGroupMember -Identity "Protected Users" `
 -Members "Administrator"
-\`\`\`
+```
 
 ### 3. AES256 Encryption
-\`\`\`powershell
+```powershell
 # Force AES on KRBTGT account
-Set-ADUser -Identity krbtgt \`
+Set-ADUser -Identity krbtgt `
 -KerberosEncryptionType AES128,AES256
 
 # Makes forging tickets harder
 # Attacker needs AES hash not RC4
-\`\`\`
+```
 
 ### 4. Short Ticket Lifetime
-\`\`\`
+```
 Default Domain Policy
 → Kerberos Policy
 → Maximum user ticket lifetime: 10 hours
 → Limits how long forged tickets work
-\`\`\`
+```
 
 ## Detection
-\`\`\`powershell
+```powershell
 # Detect Golden Ticket usage
 # Look for Event 4769 with unusual properties:
 # - Non-existent username
@@ -170,7 +170,7 @@ Format-List
 
 # Microsoft ATA and Defender for Identity
 # automatically detect Golden Ticket usage
-\`\`\`
+```
 
 ## Key Lessons
 - Golden Ticket is one of the most powerful AD attacks
